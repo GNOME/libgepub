@@ -28,39 +28,6 @@ reload_current_chapter (GepubWidget *widget)
     g_free (txt);
 }
 
-static void
-update_text (GepubDoc *doc)
-{
-    GList *l, *chunks;
-    GtkTextIter start, end;
-
-    gtk_text_buffer_get_start_iter (page_buffer, &start);
-    gtk_text_buffer_get_end_iter (page_buffer, &end);
-    gtk_text_buffer_delete (page_buffer, &start, &end);
-
-    chunks = gepub_doc_get_text (doc);
-
-    for (l=chunks; l; l = l->next) {
-        GepubTextChunk *chunk = GEPUB_TEXT_CHUNK (l->data);
-        if (chunk->type == GEPUBTextHeader) {
-            gtk_text_buffer_insert_at_cursor (page_buffer, "\n", -1);
-            gtk_text_buffer_get_end_iter (page_buffer, &end);
-            gtk_text_buffer_insert_with_tags_by_name (page_buffer, &end, chunk->text, -1, "head",  NULL);
-            gtk_text_buffer_insert_at_cursor (page_buffer, "\n", -1);
-        } else if (chunk->type == GEPUBTextNormal) {
-            gtk_text_buffer_insert_at_cursor (page_buffer, "\n", -1);
-            gtk_text_buffer_insert_at_cursor (page_buffer, chunk->text, -1);
-            gtk_text_buffer_insert_at_cursor (page_buffer, "\n", -1);
-        } else if (chunk->type == GEPUBTextItalic) {
-            gtk_text_buffer_get_end_iter (page_buffer, &end);
-            gtk_text_buffer_insert_with_tags_by_name (page_buffer, &end, chunk->text, -1, "italic",  NULL);
-        } else if (chunk->type == GEPUBTextBold) {
-            gtk_text_buffer_get_end_iter (page_buffer, &end);
-            gtk_text_buffer_insert_with_tags_by_name (page_buffer, &end, chunk->text, -1, "bold",  NULL);
-        }
-    }
-}
-
 #if 0
 static void
 print_replaced_text (GepubDoc *doc)
@@ -116,36 +83,7 @@ button_pressed (GtkButton *button, GepubWidget *widget)
         l = l ? l : 1.5;
         gepub_widget_set_lineheight (widget, l - 0.1);
     }
-    update_text (doc);
     //print_replaced_text (doc);
-}
-
-static void
-test_open (const char *path)
-{
-    GepubArchive *a;
-    GList *list_files;
-    gint i;
-    gint size;
-
-    a = gepub_archive_new (path);
-    list_files = gepub_archive_list_files (a);
-    if (!list_files) {
-        PTEST ("ERROR: BAD epub file");
-        g_object_unref (a);
-        return;
-    }
-
-    size = g_list_length (list_files);
-    PTEST ("%d\n", size);
-    for (i = 0; i < size; i++) {
-        PTEST ("file: %s\n", (char *)g_list_nth_data (list_files, i));
-        g_free (g_list_nth_data (list_files, i));
-    }
-
-    g_list_free (list_files);
-
-    g_object_unref (a);
 }
 
 static void
@@ -160,48 +98,17 @@ find_xhtml (gchar *key, GepubResource *value, gpointer data)
 static void
 test_read (const char *path)
 {
-    GepubArchive *a;
     GList *list_files = NULL;
-    const guchar *buffer;
     gchar *file = NULL;
-    gsize bufsize;
-    GBytes *bytes;
     GepubDoc *doc;
     GHashTable *ht;
-
-    a = gepub_archive_new (path);
 
     doc = gepub_doc_new (path, NULL);
     ht = (GHashTable*)gepub_doc_get_resources (doc);
     g_hash_table_foreach (ht, (GHFunc)find_xhtml, &file);
 
-    bytes = gepub_archive_read_entry (a, file);
-    if (bytes) {
-        buffer = g_bytes_get_data (bytes, &bufsize);
-        PTEST ("doc:%s\n----\n%s\n-----\n", file, buffer);
-        g_bytes_unref (bytes);
-    }
-
     g_list_foreach (list_files, (GFunc)g_free, NULL);
     g_list_free (list_files);
-
-    g_object_unref (a);
-}
-
-static void
-test_root_file (const char *path)
-{
-    GepubArchive *a;
-    gchar *root_file = NULL;
-
-    a = gepub_archive_new (path);
-
-    root_file = gepub_archive_get_root_file (a);
-    PTEST ("root file: %s\n", root_file);
-    if (root_file)
-        g_free (root_file);
-
-    g_object_unref (a);
 }
 
 static void
@@ -353,7 +260,6 @@ main (int argc, char **argv)
     gtk_text_buffer_create_tag (page_buffer, "bold", "weight", PANGO_WEIGHT_BOLD, "foreground", "#ff0000", NULL);
     gtk_text_buffer_create_tag (page_buffer, "italic", "style", PANGO_STYLE_ITALIC, "foreground", "#005500", NULL);
     gtk_text_buffer_create_tag (page_buffer, "head", "size-points", 20.0, NULL);
-    update_text (doc);
     gtk_container_add (GTK_CONTAINER (scrolled), GTK_WIDGET (textview2));
     gtk_widget_set_size_request (GTK_WIDGET (textview2), 500, 300);
 
@@ -429,9 +335,7 @@ main (int argc, char **argv)
 
 
     // Testing all
-    TEST(test_open, argv[1])
     TEST(test_read, argv[1])
-    TEST(test_root_file, argv[1])
     TEST(test_doc_name, argv[1])
     TEST(test_doc_resources, argv[1])
     TEST(test_doc_spine, argv[1])

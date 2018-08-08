@@ -1,7 +1,5 @@
 headers = files(
-  'gepub-archive.h',
   'gepub-doc.h',
-  'gepub-text-chunk.h',
   'gepub-widget.h',
   'gepub.h'
 )
@@ -11,13 +9,8 @@ install_headers(
   subdir: gepub_lib_name
 )
 
-private_headers = files('gepub-utils.h')
-
 sources = files(
-  'gepub-archive.c',
   'gepub-doc.c',
-  'gepub-text-chunk.c',
-  'gepub-utils.c',
   'gepub-widget.c'
 )
 
@@ -80,7 +73,7 @@ if get_option('introspection') and get_option('default_library') == 'shared'
   libgepub_gir = gnome.generate_gir(
     libgepub,
     header: 'gepub.h',
-    sources: sources + headers + private_headers,
+    sources: sources + headers,
     namespace: gepub_gir_ns,
     nsversion: gepub_api_version,
     includes: gir_incs,

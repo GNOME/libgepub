@@ -32,12 +32,9 @@ cargo_build = custom_target('cargo-build',
 #                        arguments: ['@CURRENT_SOURCE_DIR@', '@OUTPUT@'],
 #                        output: '@BASENAME@.a')
 #libfiles = gen.process('libgepub_internals')
-libgepub_internals_lib = static_library('epub_internals', cargo_build)
-
-cc = meson.get_compiler('c')
-libdir = meson.current_build_dir()
-#libgepub_internals_lib = cc.find_library('gepub_internals', dirs: [libdir], required: false)
+libgepub_internals_lib = static_library('gepub_internals', cargo_build)
 
 libgepub_internals_dep = declare_dependency(
   link_with: libgepub_internals_lib,
+  sources: cargo_build,
 )
