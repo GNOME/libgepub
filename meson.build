@@ -31,6 +31,7 @@ libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
 cc = meson.get_compiler('c')
 
 gepub_deps = [
+  dependency('gepub_internals', fallback: ['libgepub_internals', 'libgepub_internals_dep']),
   dependency('webkit2gtk-4.0'),
   dependency('libsoup-2.4'),
   dependency('glib-2.0'),

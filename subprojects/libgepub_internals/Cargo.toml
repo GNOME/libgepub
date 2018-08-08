@@ -1,0 +1,13 @@
+[package]
+name = "gepub_internals"
+version = "0.0.1"
+authors = ["Daniel Garcia Moreno <danigm@wadobo.com>"]
+
+[dependencies]
+libc = "0.2"
+epub = "1.1.1"
+glib = "0.5.0"
+
+[lib]
+name = "gepub_internals"
+crate-type = ["staticlib"]

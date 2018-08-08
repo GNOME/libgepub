@@ -15,3 +15,5 @@ libtool
 *.lo
 .deps
 .libs
+
+_build/
