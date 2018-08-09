@@ -28,13 +28,14 @@ cargo_build = custom_target('cargo-build',
                         install: false,
                         command: [cargo_script, '@CURRENT_SOURCE_DIR@', '@OUTPUT@'])
 
-#gen = generator(cargo_script,
-#                        arguments: ['@CURRENT_SOURCE_DIR@', '@OUTPUT@'],
-#                        output: '@BASENAME@.a')
-#libfiles = gen.process('libgepub_internals')
 libgepub_internals_lib = static_library('gepub_internals', cargo_build)
+
+cc = meson.get_compiler('c')
+th = dependency('threads')
+libdl = cc.find_library('dl')
 
 libgepub_internals_dep = declare_dependency(
   link_with: libgepub_internals_lib,
+  dependencies: [th, libdl],
   sources: cargo_build,
 )
