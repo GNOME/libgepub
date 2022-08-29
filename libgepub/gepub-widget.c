@@ -231,18 +231,18 @@ set_current_chapter_by_uri (WebKitWebView  *web_view)
 {
     GepubWidget *widget = GEPUB_WIDGET (web_view);
     const gchar *uri_string;
-    SoupURI *uri;
+    GUri *uri;
     const gchar *path;
     gint chapter;
 
     uri_string = webkit_web_view_get_uri (web_view);
 
     if (g_strcmp0 ("about:blank", uri_string)) {
-        uri = soup_uri_new (uri_string);
-        path = soup_uri_get_path (uri);
+        uri = g_uri_parse (uri_string, SOUP_HTTP_URI_FLAGS, NULL);
+        path = g_uri_get_path (uri);
         chapter = gepub_doc_resource_uri_to_chapter (widget->doc, path);
         gepub_doc_set_chapter (widget->doc, chapter);
-        soup_uri_free (uri);
+        g_uri_unref (uri);
     }
     // Else we're on the cover or table of contents (and can't tell which)
     // but we can only get there through setting the chapter number

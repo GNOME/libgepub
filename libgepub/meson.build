@@ -69,7 +69,7 @@ if get_option('introspection') and get_option('default_library') == 'shared'
   gir_incs = [
     'GObject-2.0',
     'libxml2-2.0',
-    'WebKit2-4.0'
+    'WebKit2-4.1'
   ]
 
   gir_extra_args = '--warn-all'

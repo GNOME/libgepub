@@ -42,10 +42,10 @@ set_epub_uri (xmlNode *node,
 
     gchar *attrname = NULL;
 
-    SoupURI *baseURI;
+    g_autoptr (GUri) baseURI = NULL;
     gchar *basepath = g_strdup_printf ("epub:///%s/", path);
 
-    baseURI = soup_uri_new (basepath);
+    baseURI = g_uri_parse (basepath, SOUP_HTTP_URI_FLAGS, NULL);
     g_free (basepath);
 
     if (ns) {
@@ -59,15 +59,14 @@ set_epub_uri (xmlNode *node,
             text = xmlGetProp (cur_node, BAD_CAST (attr));
 
             if (!strcmp ((const char *) cur_node->name, tagname) && text && text[0] != '#') {
-                SoupURI *uri = soup_uri_new_with_base (baseURI, (const char *) text);
-                gchar *value = soup_uri_to_string (uri, FALSE);
+                g_autoptr (GUri) uri = g_uri_parse_relative (baseURI, (const char *) text, SOUP_HTTP_URI_FLAGS, NULL);
+                gchar *value = g_uri_to_string (uri);
 
-                if (!g_str_equal (soup_uri_get_scheme (uri), "epub"))
+                if (!g_str_equal (g_uri_get_scheme (uri), "epub"))
                     g_clear_pointer (&value, g_free);
 
                 xmlSetProp (cur_node, BAD_CAST (attrname), BAD_CAST (value));
 
-                soup_uri_free (uri);
                 g_free (value);
             }
             if (text) {
@@ -81,8 +80,6 @@ set_epub_uri (xmlNode *node,
     }
 
     g_free (attrname);
-
-    soup_uri_free (baseURI);
 }
 
 static gboolean
