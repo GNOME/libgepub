@@ -1,1 +1,2 @@
 option('introspection', type: 'boolean', value: true, description: 'Enable GObject Introspection (depends on GObject)')
+option('widget', type: 'boolean', value: true, description: 'Build with GepubWidget based on Webkit')

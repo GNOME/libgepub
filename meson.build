@@ -31,7 +31,6 @@ libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
 cc = meson.get_compiler('c')
 
 gepub_deps = [
-  dependency('webkit2gtk-4.1'),
   dependency('libsoup-3.0'),
   dependency('glib-2.0'),
   dependency('gobject-2.0'),
@@ -40,15 +39,29 @@ gepub_deps = [
   dependency('libarchive')
 ]
 
+if get_option('widget')
+  webkit2gtk = dependency('webkit2gtk-4.1')
+  gepub_deps += [webkit2gtk]
+endif
+
 gnome = import('gnome')
 pkg = import('pkgconfig')
 
 top_inc = include_directories('.')
 
 subdir('libgepub')
-subdir('tests')
+
+if get_option('widget')
+  subdir('tests')
+endif
+
+config_h = configuration_data()
+
+if get_option('widget')
+  config_h.set('GEPUB_WIDGET_ENABLED', 1)
+endif
 
 configure_file(
   output: 'config.h',
-  configuration: configuration_data()
+  configuration: config_h,
 )

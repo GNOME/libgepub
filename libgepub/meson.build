@@ -2,7 +2,6 @@ headers = files(
   'gepub-archive.h',
   'gepub-doc.h',
   'gepub-text-chunk.h',
-  'gepub-widget.h',
   'gepub.h'
 )
 
@@ -18,8 +17,12 @@ sources = files(
   'gepub-doc.c',
   'gepub-text-chunk.c',
   'gepub-utils.c',
-  'gepub-widget.c'
 )
+
+if get_option('widget')
+  sources += files('gepub-widget.c')
+  headers += files('gepub-widget.h')
+endif
 
 symbol_map = join_paths(meson.current_source_dir(), 'gepub.map')
 
@@ -69,8 +72,11 @@ if get_option('introspection') and get_option('default_library') == 'shared'
   gir_incs = [
     'GObject-2.0',
     'libxml2-2.0',
-    'WebKit2-4.1'
   ]
+
+  if get_option('widget')
+    gir_incs += ['WebKit2-4.1']
+  endif
 
   gir_extra_args = '--warn-all'
 
