@@ -4,8 +4,7 @@ stages:
 variables:
   FEDORA_DEPENDENCIES:
     gcc
-    webkit2gtk3-devel
-    libsoup-devel
+    libsoup3-devel
     glib2-devel
     libxml2-devel
     libarchive-devel
