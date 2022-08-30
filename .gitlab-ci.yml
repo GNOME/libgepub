@@ -25,7 +25,7 @@ build-fedora:
     - dnf update -y --nogpgcheck
     - dnf -y install --nogpgcheck $FEDORA_DEPENDENCIES
   script:
-    - meson _build
+    - meson _build -Dwidget=false
     - ninja -C _build dist
     - curl https://gitlab.freedesktop.org/hadess/check-abi/-/raw/main/contrib/check-abi-fedora.sh | bash
     - dnf install -y $FEDORA_DEPENDENCIES_ABI_CHECK
