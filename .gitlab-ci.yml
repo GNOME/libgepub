@@ -11,9 +11,6 @@ variables:
     gobject-introspection-devel
     meson
     git
-  FEDORA_DEPENDENCIES_ABI_CHECK:
-    libabigail
-  LAST_ABI_BREAK: "3dd049036d6d4c70307d1167dc56b283c297f066"
 
 build-fedora:
   image: fedora:latest
@@ -26,6 +23,3 @@ build-fedora:
   script:
     - meson _build -Dwidget=false
     - ninja -C _build dist
-    - curl https://gitlab.freedesktop.org/hadess/check-abi/-/raw/main/contrib/check-abi-fedora.sh | bash
-    - dnf install -y $FEDORA_DEPENDENCIES_ABI_CHECK
-    - check-abi ${LAST_ABI_BREAK} $(git rev-parse HEAD)
