@@ -381,7 +381,10 @@ gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
     // TODO: get docTitle
     // TODO: parse metadata (dtb:totalPageCount, dtb:depth, dtb:maxPageNumber)
 
-    item = mapnode->children;
+    if (mapnode) {
+        item = mapnode->children;
+    }
+
     while (item) {
         GepubNavPoint *navpoint = NULL;
         gchar *order;
