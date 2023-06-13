@@ -1,3 +1,8 @@
+Version 0.7.1
+=============
+
+ - doc: Fix Crash in gepub_doc_new()
+
 Version 0.7.0
 =============
 
