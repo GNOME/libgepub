@@ -3,7 +3,7 @@ project(
   version: '0.7.1',
   license: 'LGPL2+',
   default_options: 'buildtype=debugoptimized',
-  meson_version: '>= 0.46.0'
+  meson_version: '>= 0.50.0'
 )
 
 gepub_version = meson.project_version()
@@ -64,4 +64,6 @@ endif
 configure_file(
   output: 'config.h',
   configuration: config_h,
+  install: true,
+  install_dir: gepub_includedir / gepub_lib_name,
 )
