@@ -5,11 +5,6 @@ headers = files(
   'gepub.h'
 )
 
-install_headers(
-  headers,
-  subdir: gepub_lib_name
-)
-
 private_headers = files('gepub-utils.h')
 
 sources = files(
@@ -32,6 +27,11 @@ ldflags = []
 if cc.has_link_argument(test_ldflag)
   ldflags += test_ldflag
 endif
+
+install_headers(
+  headers,
+  subdir: gepub_lib_name
+)
 
 libgepub = library(
   'gepub-'+gepub_api_version,
