@@ -156,18 +156,12 @@ gepub_archive_read_entry (GepubArchive *archive,
     size = archive_entry_size (entry);
 
     // Validate size
-    if (size > G_MAXSIZE) {
+    if (size == 0 || size >= G_MAXSIZE) {
         gepub_archive_close (archive);
         return NULL;
     }
 
-    // Allocate buffer with additional error handling
     buffer = g_malloc0 (size);
-    if (!buffer) {
-        gepub_archive_close (archive);
-        return NULL;
-    }
-
     archive_read_data (archive->archive, buffer, size);
 
     gepub_archive_close (archive);
