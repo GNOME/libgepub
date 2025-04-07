@@ -1,3 +1,9 @@
+Version 0.7.2
+=============
+
+ - Fix integer overflow in gepub-archive
+ - Install missing config.h and gepub-widget.h
+
 Version 0.7.1
 =============
 
