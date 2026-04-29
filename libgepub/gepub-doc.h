@@ -44,6 +44,7 @@ struct _GepubNavPoint {
     gchar *label;
     gchar *content;
     guint64 playorder;
+    gint depth;
 };
 
 typedef struct _GepubResource GepubResource;

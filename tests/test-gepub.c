@@ -287,7 +287,11 @@ test_doc_toc (const char *path)
     GList *nav = gepub_doc_get_toc (doc);
     while (nav && nav->data) {
         GepubNavPoint *point = (GepubNavPoint*)nav->data;
+        for (int i = 0; i < point->depth; i++)
+            PTEST ("\t");
         PTEST ("%02d: %s -> %s\n", (gint)point->playorder, point->label, point->content);
+        for (int i = 0; i < point->depth; i++)
+            PTEST ("\t");
         PTEST (" -> Chapter: %d\n", gepub_doc_resource_uri_to_chapter (doc, point->content));
         nav = nav->next;
     }

@@ -355,36 +355,8 @@ navpoint_compare (GepubNavPoint *a, GepubNavPoint *b)
 }
 
 static void
-gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
+gepub_doc_fill_toc_recursion(GepubDoc *doc, GList **toc, xmlNode *item, int depth)
 {
-    xmlDoc *xdoc = NULL;
-    xmlNode *root_element = NULL;
-    xmlNode *mapnode = NULL;
-    xmlNode *item = NULL;
-    const char *data;
-    gsize size;
-    GList *toc = NULL;
-    GBytes *toc_data = NULL;
-
-    doc->toc = toc;
-
-    toc_data = gepub_doc_get_resource_by_id (doc, toc_id);
-    if (!toc_data) {
-        return;
-    }
-
-    data = g_bytes_get_data (toc_data, &size);
-    xdoc = xmlRecoverMemory (data, size);
-    root_element = xmlDocGetRootElement (xdoc);
-    mapnode = gepub_utils_get_element_by_tag (root_element, "navMap");
-
-    // TODO: get docTitle
-    // TODO: parse metadata (dtb:totalPageCount, dtb:depth, dtb:maxPageNumber)
-
-    if (mapnode) {
-        item = mapnode->children;
-    }
-
     while (item) {
         GepubNavPoint *navpoint = NULL;
         gchar *order;
@@ -398,6 +370,7 @@ gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
 
         navpoint = g_malloc0 (sizeof (GepubNavPoint));
 
+        navpoint->depth = depth;
         order = gepub_utils_get_prop (item, "playOrder");
         if (order) {
             g_ascii_string_to_unsigned (order, 10, 0, INT_MAX,
@@ -439,10 +412,49 @@ gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
             navchilds = navchilds->next;
         }
 
-        toc = g_list_prepend (toc, navpoint);
+        if (item->children) {
+          gepub_doc_fill_toc_recursion(doc, toc, item->children, depth + 1);
+        }
+
+        *toc = g_list_prepend (*toc, navpoint);
         item = item->next;
     }
+}
 
+static void
+gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
+{
+    xmlDoc *xdoc = NULL;
+    xmlNode *root_element = NULL;
+    xmlNode *mapnode = NULL;
+    xmlNode *item = NULL;
+    const char *data;
+    gsize size;
+    GList *toc = NULL;
+    GBytes *toc_data = NULL;
+
+    doc->toc = toc;
+
+    toc_data = gepub_doc_get_resource_by_id (doc, toc_id);
+    if (!toc_data) {
+        return;
+    }
+
+    data = g_bytes_get_data (toc_data, &size);
+    xdoc = xmlRecoverMemory (data, size);
+    root_element = xmlDocGetRootElement (xdoc);
+    mapnode = gepub_utils_get_element_by_tag (root_element, "navMap");
+
+    // TODO: get docTitle
+    // TODO: parse metadata (dtb:totalPageCount, dtb:depth, dtb:maxPageNumber)
+
+    if (mapnode) {
+        item = mapnode->children;
+    }
+
+    // Table of contents can have a hierarchy (e.g. book has multiple parts and each part has its own chapters)
+    // so we need to add navPoints recursively
+    gepub_doc_fill_toc_recursion(doc, &toc, item, 0);
     doc->toc = g_list_sort (toc, (GCompareFunc) navpoint_compare);
 
     xmlFreeDoc (xdoc);
