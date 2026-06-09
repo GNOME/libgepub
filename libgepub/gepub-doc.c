@@ -53,7 +53,6 @@ static void gepub_doc_fill_resources (GepubDoc *doc);
 static void gepub_doc_fill_spine (GepubDoc *doc);
 static void gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id);
 static void gepub_doc_initable_iface_init (GInitableIface *iface);
-static gint navpoint_compare (GepubNavPoint *a, GepubNavPoint *b);
 
 struct _GepubDoc {
     GObject parent;
@@ -348,11 +347,6 @@ gepub_doc_fill_spine (GepubDoc *doc)
     xmlFreeDoc (xdoc);
 }
 
-static gint
-navpoint_compare (GepubNavPoint *a, GepubNavPoint *b)
-{
-    return a->playorder - b->playorder;
-}
 
 static void
 gepub_doc_fill_toc_recursion(GepubDoc *doc, GList **toc, xmlNode *item, int depth)
@@ -455,7 +449,7 @@ gepub_doc_fill_toc (GepubDoc *doc, gchar *toc_id)
     // Table of contents can have a hierarchy (e.g. book has multiple parts and each part has its own chapters)
     // so we need to add navPoints recursively
     gepub_doc_fill_toc_recursion(doc, &toc, item, 0);
-    doc->toc = g_list_sort (toc, (GCompareFunc) navpoint_compare);
+    doc->toc = g_list_reverse (toc);
 
     xmlFreeDoc (xdoc);
     g_bytes_unref (toc_data);
